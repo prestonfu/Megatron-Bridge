@@ -1,0 +1,119 @@
+# Copyright (c) 2025, NVIDIA CORPORATION.  All rights reserved.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+#     http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+
+# Full Nemotron-H 30B-A3B model for pretraining on FineWeb-Edu
+# 52 layers, hidden_size=2688, 128 MoE experts
+# WSD (Warmup-Stable-Decay) LR schedule scaled to 10k iters
+
+# Data sources — supports glob patterns and per-source weights.
+data_sources:
+  - path: "/mnt/pretrain_data/fineweb_edu/processed_data_*_text_document"
+    weight: 1.0
+
+# Data configuration
+dataset:
+  sequence_length: 2048
+
+# Training configuration
+train:
+  train_iters: 10000
+  global_batch_size: 128
+  micro_batch_size: 1
+  eval_iters: 10
+
+validation:
+  eval_interval: 500
+
+# Optimizer configuration (Distributed Muon)
+optimizer:
+  optimizer: dist_muon
+  lr: 0.001
+  weight_decay: 0.1
+  use_distributed_optimizer: false
+  muon_momentum: 0.95
+  muon_use_nesterov: true
+  muon_split_qkv: false
+  muon_scale_mode: spectral
+  muon_num_ns_steps: 5
+  muon_tp_mode: blockwise
+
+# DDP config — Muon requires distributed optimizer off
+ddp:
+  use_distributed_optimizer: false
+  overlap_param_gather: false
+  overlap_grad_reduce: true
+  grad_reduce_in_fp32: true
+  check_for_nan_in_grad: true
+  data_parallel_sharding_strategy: no_shard
+
+# Learning rate scheduler — cosine annealing
+scheduler:
+  lr_decay_style: cosine
+  lr_warmup_iters: 100
+  lr_decay_iters: 10000
+  min_lr: 0.0001             # min LR = 1e-4
+
+# Checkpoint configuration
+checkpoint:
+  enabled: false
+  save_on_last_step: true
+  save: /mnt/checkpoints/megatron_bridge/nemotron_3_nano_full
+  load: /mnt/checkpoints/megatron_bridge/nemotron_3_nano_full
+  save_interval: 500
+
+# Disable TP communication overlap to save GPU memory
+comm_overlap:
+  tp_comm_overlap: false
+
+# Model configuration — full 30B-A3B variant
+# Uses default Nemotron3NanoProvider architecture (52 layers, hidden=2688)
+model:
+  seq_length: 2048
+
+  # Parallelism (TP=4, PP=2, EP=1 -> DP=1 on 8 GPUs)
+  sequence_parallel: true
+  tensor_model_parallel_size: 4
+  pipeline_model_parallel_size: 2
+  context_parallel_size: 1
+  expert_model_parallel_size: 1
+  expert_tensor_parallel_size: 4
+
+  # Activation recomputation to reduce memory (needed with PP=2)
+  # recompute_granularity: selective
+  # recompute_modules:
+  #   - core_attn
+
+  # MoE load balancing
+  moe_router_enable_expert_bias: true
+  moe_router_bias_update_rate: 0.001
+  moe_router_load_balancing_type: seq_aux_loss
+  moe_aux_loss_coeff: 0.0001
+
+# Logging
+logger:
+  log_interval: 10
+  tensorboard_dir: ./logs/nemotron_3_nano_full
+  wandb_project: megatron_bridge_pretrain
+  wandb_exp_name: nemotron_3_nano_full_fineweb_edu
+  wandb_entity: prestonfu
+
+profiling:
+  use_nsys_profiler: true
+  profile_step_start: 2
+  profile_step_end: 2
+  profile_ranks: [0]
+
+# Random seed
+rng:
+  seed: 1234
