@@ -56,12 +56,14 @@ ddp:
   check_for_nan_in_grad: true
   data_parallel_sharding_strategy: no_shard
 
-# Learning rate scheduler — cosine annealing
+# Ratios from Nemotron-3 Nano paper: ~1% warmup, 80% stable, 20% decay
 scheduler:
-  lr_decay_style: cosine
-  lr_warmup_iters: 100
+  lr_decay_style: WSD
+  lr_warmup_iters: 100       # ~1% of training
   lr_decay_iters: 10000
-  min_lr: 0.0001             # min LR = 1e-4
+  lr_wsd_decay_iters: 2000   # last 20% of training
+  lr_wsd_decay_style: cosine
+  min_lr: 0.00003             # min LR = 3e-5
 
 # Checkpoint configuration
 checkpoint:
@@ -80,7 +82,6 @@ comm_overlap:
 model:
   seq_length: 8192
 
-  # Parallelism (TP=2, EP=2 -> DP=2 on 8 GPUs)
   sequence_parallel: false
   tensor_model_parallel_size: 1
   pipeline_model_parallel_size: 1
