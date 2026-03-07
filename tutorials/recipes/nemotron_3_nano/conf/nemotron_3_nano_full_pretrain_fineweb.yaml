@@ -47,6 +47,7 @@ optimizer:
   muon_scale_mode: spectral
   muon_num_ns_steps: 5
   muon_tp_mode: blockwise
+  clip_grad: 1.0
 
 # DDP config — Muon requires distributed optimizer off
 ddp:
@@ -90,9 +91,9 @@ model:
   expert_tensor_parallel_size: 4
 
   # Activation recomputation to reduce memory (needed with PP=2)
-  # recompute_granularity: selective
-  # recompute_modules:
-  #   - core_attn
+  recompute_granularity: selective
+  recompute_modules:
+    - core_attn
 
   # MoE load balancing
   moe_router_enable_expert_bias: true
@@ -108,11 +109,11 @@ logger:
   wandb_exp_name: nemotron_3_nano_full_fineweb_edu
   wandb_entity: prestonfu
 
-profiling:
-  use_nsys_profiler: true
-  profile_step_start: 2
-  profile_step_end: 2
-  profile_ranks: [0]
+# profiling:
+#   use_nsys_profiler: true
+#   profile_step_start: 2
+#   profile_step_end: 2
+#   profile_ranks: [0]
 
 # Random seed
 rng:

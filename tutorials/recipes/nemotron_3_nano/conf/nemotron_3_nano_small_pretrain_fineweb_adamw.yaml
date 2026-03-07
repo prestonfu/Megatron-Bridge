@@ -15,6 +15,7 @@
 # Small Nemotron-H model for pretraining on FineWeb-Edu
 # 32 layers, ~57% hidden dim of the full 30B-A3B model
 # WSD (Warmup-Stable-Decay) LR schedule scaled to 10k iters
+# AdamW optimizer variant
 
 # Data sources — supports glob patterns and per-source weights.
 data_sources:
@@ -23,7 +24,7 @@ data_sources:
 
 # Data configuration
 dataset:
-  sequence_length: 2048
+  sequence_length: 8192
 
 # Training configuration
 train:
@@ -35,24 +36,21 @@ train:
 validation:
   eval_interval: 500
 
-# Optimizer configuration (Distributed Muon)
+# Optimizer configuration (AdamW)
 optimizer:
-  optimizer: dist_muon
+  optimizer: adam
   lr: 0.0003
   weight_decay: 0.1
-  use_distributed_optimizer: false
-  muon_momentum: 0.95
-  muon_use_nesterov: true
-  muon_split_qkv: false
-  muon_scale_mode: spectral
-  muon_num_ns_steps: 5
-  muon_tp_mode: blockwise
+  adam_beta1: 0.9
+  adam_beta2: 0.95
+  adam_eps: 1e-8
+  use_distributed_optimizer: true
   clip_grad: 1.0
 
-# DDP config — Muon requires distributed optimizer off
+# DDP config
 ddp:
-  use_distributed_optimizer: false
-  overlap_param_gather: false
+  use_distributed_optimizer: true
+  overlap_param_gather: true
   overlap_grad_reduce: true
   grad_reduce_in_fp32: true
   check_for_nan_in_grad: true
@@ -69,8 +67,8 @@ scheduler:
 checkpoint:
   enabled: false
   save_on_last_step: true
-  save: /mnt/checkpoints/megatron_bridge/nemotron_3_nano_small
-  load: /mnt/checkpoints/megatron_bridge/nemotron_3_nano_small
+  save: /mnt/checkpoints/megatron_bridge/nemotron_3_nano_small_adamw
+  load: /mnt/checkpoints/megatron_bridge/nemotron_3_nano_small_adamw
   save_interval: 500
 
 # Disable TP communication overlap to save GPU memory
@@ -80,14 +78,14 @@ comm_overlap:
 # Model configuration — small variant
 # 32 layers, hidden_size=1536 (57% of 2688)
 model:
-  seq_length: 2048
+  seq_length: 8192
 
   # Parallelism (TP=2, EP=2 -> DP=2 on 8 GPUs)
-  sequence_parallel: true
-  tensor_model_parallel_size: 2
+  sequence_parallel: false
+  tensor_model_parallel_size: 1
   pipeline_model_parallel_size: 1
   context_parallel_size: 1
-  expert_model_parallel_size: 2
+  expert_model_parallel_size: 8
 
   # Architecture overrides for small model
   num_layers: 32
@@ -117,9 +115,9 @@ logger:
   log_interval: 10
   log_throughput: true
   log_throughput_to_tensorboard: true
-  tensorboard_dir: ./logs/nemotron_3_nano_small
+  tensorboard_dir: ./logs/nemotron_3_nano_small_adamw
   wandb_project: megatron_bridge_pretrain
-  wandb_exp_name: nemotron_3_nano_small_fineweb_edu
+  wandb_exp_name: nemotron_3_nano_small_adamw_fineweb_edu
   wandb_entity: prestonfu
 
 # Random seed

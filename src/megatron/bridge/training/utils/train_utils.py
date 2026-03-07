@@ -33,7 +33,7 @@ from megatron.core.utils import get_data_parallel_group_if_dtensor, to_local_if_
 from megatron.bridge.training.config import ConfigContainer, TrainingConfig
 from megatron.bridge.training.forward_step_func_types import ForwardStepCallable
 from megatron.bridge.training.state import GlobalState, TrainState
-from megatron.bridge.training.utils.flop_utils import num_floating_point_operations
+from megatron.bridge.training.utils.flop_utils import compute_mfu, num_floating_point_operations
 from megatron.bridge.training.utils.mlflow_utils import _sanitize_mlflow_metrics
 from megatron.bridge.training.utils.pg_utils import get_pg_collection
 from megatron.bridge.training.utils.theoretical_memory_utils import report_theoretical_memory
@@ -653,27 +653,41 @@ def training_log(
         # Calculate GPU utilization
         num_flops = num_floating_point_operations(config, batch_size)
         per_gpu_tf = num_flops / elapsed_time_per_iteration / get_world_size_safe() / 1e12
+        tokens_per_sec = (batch_size * config.dataset.seq_length) / elapsed_time_per_iteration
+        mfu = compute_mfu(per_gpu_tf)
+
         print_rank_0(
-            f"Step Time : {elapsed_time_per_iteration:.2f}s GPU utilization: {per_gpu_tf:.1f}MODEL_TFLOP/s/GPU"
+            f"Step Time : {elapsed_time_per_iteration:.2f}s"
+            f" TPS: {tokens_per_sec:.0f} tok/s"
+            f" GPU utilization: {per_gpu_tf:.1f} MODEL_TFLOP/s/GPU"
+            + (f" MFU: {mfu * 100:.1f}%" if mfu is not None else "")
         )
 
         if logger_config.log_throughput_to_tensorboard:
             if writer:
                 writer.add_scalar("throughput/tflops/device", per_gpu_tf, iteration)
                 writer.add_scalar("throughput/tflops", per_gpu_tf * get_world_size_safe(), iteration)
+                writer.add_scalar("throughput/tokens_per_sec", tokens_per_sec, iteration)
+                writer.add_scalar("throughput/tokens_per_sec_per_gpu", tokens_per_sec / get_world_size_safe(), iteration)
+                if mfu is not None:
+                    writer.add_scalar("throughput/mfu", mfu, iteration)
                 if wandb_writer:
                     wandb_writer.log({"throughput/tflops/device": per_gpu_tf}, iteration)
                     wandb_writer.log({"throughput/tflops": per_gpu_tf * get_world_size_safe()}, iteration)
+                    wandb_writer.log({"throughput/tokens_per_sec": tokens_per_sec}, iteration)
+                    wandb_writer.log({"throughput/tokens_per_sec_per_gpu": tokens_per_sec / get_world_size_safe()}, iteration)
+                    if mfu is not None:
+                        wandb_writer.log({"throughput/mfu": mfu}, iteration)
                 if mlflow_logger:
-                    mlflow_logger.log_metrics(
-                        _sanitize_mlflow_metrics(
-                            {
-                                "throughput/tflops/device": per_gpu_tf,
-                                "throughput/tflops": per_gpu_tf * get_world_size_safe(),
-                            }
-                        ),
-                        step=iteration,
-                    )
+                    mf_metrics = {
+                        "throughput/tflops/device": per_gpu_tf,
+                        "throughput/tflops": per_gpu_tf * get_world_size_safe(),
+                        "throughput/tokens_per_sec": tokens_per_sec,
+                        "throughput/tokens_per_sec_per_gpu": tokens_per_sec / get_world_size_safe(),
+                    }
+                    if mfu is not None:
+                        mf_metrics["throughput/mfu"] = mfu
+                    mlflow_logger.log_metrics(_sanitize_mlflow_metrics(mf_metrics), step=iteration)
 
         if logger_config.log_timers_to_tensorboard:
             if writer:
@@ -690,7 +704,10 @@ def training_log(
         log_string += " elapsed time per iteration (ms): {:.1f} |".format(elapsed_time_per_iteration * 1000.0)
 
         if logger_config.log_throughput:
+            log_string += f" tokens/s: {tokens_per_sec:.0f} |"
             log_string += f" throughput per GPU (TFLOP/s/GPU): {per_gpu_tf:.1f} |"
+            if mfu is not None:
+                log_string += f" MFU: {mfu * 100:.1f}% |"
 
         if energy_monitor is not None:
             energy = (energy_monitor.lap() / total_iterations) / get_world_size_safe()

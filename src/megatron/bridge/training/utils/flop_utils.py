@@ -15,6 +15,7 @@
 import importlib
 from pathlib import Path
 
+import torch
 import torch.nn.functional as F
 
 from megatron.bridge.data.datasets.packing_utils import calculate_avg_seqlen
@@ -24,6 +25,33 @@ from megatron.bridge.utils.vocab_utils import calculate_padded_vocab_size
 
 
 _lora_seq_stats_cache: dict = {}
+
+# Peak BF16 TFLOP/s per GPU by CUDA compute capability (major, minor).
+# Sources: NVIDIA datasheets, BF16 Tensor Core (non-sparsity) numbers.
+_BF16_PEAK_TFLOPS_BY_CC: dict = {
+    (8, 0): 312,    # A100 SXM4
+    (8, 6): 125,    # A10G / A30
+    (8, 9): 165,    # L40S / RTX 4090
+    (9, 0): 989,    # H100 SXM5
+    (10, 0): 2958,  # B200 SXM
+}
+
+
+def get_gpu_peak_tflops_bf16() -> float | None:
+    """Return peak BF16 TFLOP/s for the current GPU, or None if unknown."""
+    try:
+        props = torch.cuda.get_device_properties(0)
+        return _BF16_PEAK_TFLOPS_BY_CC.get((props.major, props.minor), None)
+    except Exception:
+        return None
+
+
+def compute_mfu(achieved_tflops_per_gpu: float) -> float | None:
+    """Return Model FLOP Utilization (MFU) as a fraction [0, 1], or None if peak is unknown."""
+    peak = get_gpu_peak_tflops_bf16()
+    if peak is None:
+        return None
+    return achieved_tflops_per_gpu / peak
 
 
 def num_floating_point_operations(cfg: ConfigContainer, batch_size: int = 1):
