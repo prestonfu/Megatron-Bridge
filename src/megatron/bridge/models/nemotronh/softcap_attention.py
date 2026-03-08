@@ -74,7 +74,10 @@ class SoftcapFlashAttention(nn.Module):
         )
         head_dim = config.kv_channels
         self.softmax_scale = softmax_scale if softmax_scale is not None else head_dim ** -0.5
-        # Required by qk_clip.py — set to None since we don't track per-head max logits
+        self.log_max_attention_logit = getattr(config, 'log_max_attention_logit', False)
+        # Approximation of per-head max logit via log-sum-exp upper bound.
+        # True max <= LSE <= true max + log(seq_len).
+        # Set to None between steps; populated in forward when log_max_attention_logit is enabled.
         self.current_max_attn_logits = None
 
     def forward(
@@ -98,13 +101,23 @@ class SoftcapFlashAttention(nn.Module):
         k = key.transpose(0, 1).contiguous()
         v = value.transpose(0, 1).contiguous()
 
-        out = flash_attn_func(
+        out, softmax_lse, _ = flash_attn_func(
             q, k, v,
             dropout_p=self.attention_dropout if self.training else 0.0,
             softmax_scale=self.softmax_scale,
             causal=True,
             softcap=self.softcap,
+            return_attn_probs=True,
         )
+
+        if self.log_max_attention_logit:
+            # softmax_lse: [b, np, sq] — upper bound on per-head max logit (lse ≥ true max)
+            lse_max = softmax_lse.max(dim=-1).values.max(dim=0).values  # [np]
+            if self.current_max_attn_logits is None:
+                self.current_max_attn_logits = lse_max
+            else:
+                self.current_max_attn_logits = torch.max(self.current_max_attn_logits, lse_max)
+
         # bshd -> sbhd, then flatten heads: [sq, b, np*hn] to match TEDotProductAttention output
         b, sq, np, hn = out.shape
         return out.transpose(0, 1).reshape(sq, b, np * hn).contiguous()
