@@ -26,7 +26,11 @@ import torch.nn as nn
 from megatron.core.num_microbatches_calculator import get_num_microbatches
 from megatron.core.tensor_parallel import param_is_not_tensor_parallel_duplicate
 from megatron.core.transformer.module import MegatronModule
-from megatron.core.transformer.moe.moe_utils import track_moe_metrics
+from megatron.core.transformer.moe.moe_utils import (
+    clear_tokens_per_expert_tracker,
+    get_tokens_per_expert_tracker,
+    track_moe_metrics,
+)
 from megatron.core.transformer.multi_token_prediction import MTPLossLoggingHelper
 from megatron.core.utils import get_data_parallel_group_if_dtensor, to_local_if_dtensor
 
@@ -348,6 +352,7 @@ def training_log(
     history_wct: list,
     model: list[MegatronModule],
     log_max_attention_logit: Optional[float] = None,
+    per_layer_max_attn_logits: Optional[dict] = None,
 ) -> bool:
     """Log training stats (losses, learning rate, timings, etc.).
 
@@ -609,6 +614,18 @@ def training_log(
                 wandb_writer.log({"max-attention-logit": log_max_attention_logit}, iteration)
             if mlflow_logger:
                 mlflow_logger.log_metrics({"max-attention-logit": log_max_attention_logit}, step=iteration)
+        if per_layer_max_attn_logits is not None:
+            per_layer_metrics = {
+                f"max-attention-logit/layer_{layer}": val
+                for layer, val in per_layer_max_attn_logits.items()
+            }
+            if wandb_writer:
+                wandb_writer.log(per_layer_metrics, iteration)
+            if writer:
+                for k, v in per_layer_metrics.items():
+                    writer.add_scalar(k, v, iteration)
+            if mlflow_logger:
+                mlflow_logger.log_metrics(_sanitize_mlflow_metrics(per_layer_metrics), step=iteration)
 
     if config.model.num_moe_experts is not None:
         moe_loss_scale = 1 / get_num_microbatches()
@@ -643,6 +660,29 @@ def training_log(
             mtp_num_layers=config.model.mtp_num_layers,
             pg_collection=pg_collection,
         )
+
+        # Log per-expert token distribution stats (aggregated across all MoE layers)
+        tpe_tracker = get_tokens_per_expert_tracker()
+        if tpe_tracker:
+            all_layers = torch.stack(list(tpe_tracker.values()), dim=0)  # [num_moe_layers, num_experts]
+            tokens_per_expert = all_layers.sum(dim=0)  # [num_experts] — total across layers
+            q = torch.tensor([0.0, 0.25, 0.5, 0.75, 1.0], device=tokens_per_expert.device)
+            quantiles = torch.quantile(tokens_per_expert.float(), q)
+            expert_token_stats = {
+                "expert_tokens/min": quantiles[0].item(),
+                "expert_tokens/q25": quantiles[1].item(),
+                "expert_tokens/median": quantiles[2].item(),
+                "expert_tokens/q75": quantiles[3].item(),
+                "expert_tokens/max": quantiles[4].item(),
+            }
+            if wandb_writer:
+                wandb_writer.log(expert_token_stats, iteration)
+            if writer:
+                for k, v in expert_token_stats.items():
+                    writer.add_scalar(k, v, iteration)
+            if mlflow_logger:
+                mlflow_logger.log_metrics(_sanitize_mlflow_metrics(expert_token_stats), step=iteration)
+        clear_tokens_per_expert_tracker()
     if config.model.mtp_num_layers is not None:
         mtp_loss_scale = 1 / get_num_microbatches()
         MTPLossLoggingHelper.track_mtp_metrics(mtp_loss_scale, iteration, writer, wandb_writer, total_loss_dict)

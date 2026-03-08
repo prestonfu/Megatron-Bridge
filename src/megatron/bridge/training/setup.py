@@ -227,6 +227,11 @@ def setup(
         pg_collection=pg_collection,
     )
 
+    num_params = sum(p.numel() for m in model for p in m.parameters())
+    print_rank_0(f"num_params: {num_params:,} ({num_params / 1e9:.3f}B)")
+    if state.wandb_logger is not None:
+        state.wandb_logger.run.config.update({"num_params": num_params}, allow_val_change=True)
+
     cfg.model.timers = timers
     cfg.optimizer.timers = timers
     optimizer, scheduler = setup_optimizer(

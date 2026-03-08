@@ -127,6 +127,9 @@ class MambaModelProvider(TransformerConfig, ModelProviderMixin[MCoreMambaModel])
     # If True, restore the modelopt_state that contains quantization, sparsity, speculative decoding transformation state.
     restore_modelopt_state: bool = False
 
+    attn_logit_softcap: Optional[float] = None  # Gemma 2 uses 50.0; cap on QK dot products before softmax
+    output_logit_softcap: Optional[float] = None  # Gemma 2 uses 30.0; nanogpt tuned to 15.0; cap on output logits
+
     def provide(self, pre_process=None, post_process=None, vp_stage=None) -> MCoreMambaModel:
         """Configure and instantiate a Megatron Core Mamba model based on this configuration.
 

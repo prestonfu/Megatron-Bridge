@@ -67,14 +67,14 @@ scheduler:
   lr_decay_iters: 10000
   lr_wsd_decay_iters: 2000   # last 20% of training
   lr_wsd_decay_style: cosine
-  min_lr: 0.00003             # min LR = 3e-5
+  min_lr: 0.00003
 
 # Checkpoint configuration
 checkpoint:
   enabled: false
   save_on_last_step: true
   save: /mnt/checkpoints/megatron_bridge/nemotron_3_nano_small_muon
-  load: /mnt/checkpoints/megatron_bridge/nemotron_3_nano_small_muon
+  load: null
   save_interval: 500
 
 # Disable TP communication overlap to save GPU memory
@@ -118,6 +118,8 @@ model:
   # Stability features
   qk_layernorm: true
   log_max_attention_logit: true
+  attn_logit_softcap: 50.0    # cap on QK dot products before softmax
+  output_logit_softcap: 15.0  # cap on output logits before cross-entropy
 
 # Logging
 logger:

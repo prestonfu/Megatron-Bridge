@@ -373,6 +373,7 @@ def train(
             grad_norm,
             num_zeros_in_grad,
             log_max_attention_logit,
+            per_layer_max_attn_logits,
         ) = wrapped_train_step(
             wrapped_forward_step_func,
             train_data_iterator,
@@ -503,6 +504,7 @@ def train(
                 history_wct,
                 model,
                 log_max_attention_logit,
+                per_layer_max_attn_logits,
             )
 
         if (
@@ -760,10 +762,11 @@ def train_step(
     # get max attention logit for logging and run clip_qk()
     # Part of MuonClip Optimizer step
     log_max_attention_logit = None
+    per_layer_max_attn_logits = None
     do_log = hasattr(cfg.model, "log_max_attention_logit") and cfg.model.log_max_attention_logit
     do_clip = hasattr(cfg.model, "qk_clip") and cfg.model.qk_clip
     if do_log or do_clip:
-        log_max_attention_logit = clip_qk(model, log_max_only=not do_clip)
+        log_max_attention_logit, per_layer_max_attn_logits = clip_qk(model, log_max_only=not do_clip)
 
     timers("optimizer").stop()
 
@@ -820,6 +823,7 @@ def train_step(
             grad_norm,
             num_zeros_in_grad,
             log_max_attention_logit,
+            per_layer_max_attn_logits,
         )
     return (
         {},
@@ -830,6 +834,7 @@ def train_step(
         grad_norm,
         num_zeros_in_grad,
         log_max_attention_logit,
+        per_layer_max_attn_logits,
     )
 
 

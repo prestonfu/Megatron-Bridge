@@ -21,6 +21,7 @@ from megatron.core.activations import squared_relu
 from megatron.core.transformer.enums import AttnBackend
 
 from megatron.bridge.models.mamba.mamba_provider import MambaModelProvider
+from megatron.bridge.models.nemotronh.softcap_attention import get_softcap_mamba_stack_spec
 from megatron.bridge.utils.common_utils import get_rank_safe
 
 
@@ -30,6 +31,8 @@ logger = logging.getLogger(__name__)
 @dataclass
 class NemotronHModelProvider(MambaModelProvider):
     """Configuration for Nemotron-H models."""
+
+    mamba_stack_spec: object = get_softcap_mamba_stack_spec
 
     seq_length: int = 8192
     mamba_num_groups: int = 8
