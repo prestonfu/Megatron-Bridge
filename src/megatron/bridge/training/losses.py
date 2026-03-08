@@ -102,4 +102,4 @@ def masked_next_token_loss(
     num_tokens = loss_mask.sum().clone().detach().to(torch.int)
     reporting_loss = torch.cat([loss.clone().detach().view(1), num_tokens.view(1)])
 
-    return (loss, num_tokens, {"lm loss": reporting_loss})
+    return (loss, num_tokens, {"lm_loss": reporting_loss})

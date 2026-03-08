@@ -25,6 +25,7 @@ data_sources:
 # Data configuration
 dataset:
   sequence_length: 8192
+  num_workers: 2
 
 # Training configuration
 train:
@@ -110,6 +111,10 @@ model:
   moe_router_bias_update_rate: 0.001
   moe_router_load_balancing_type: seq_aux_loss
   moe_aux_loss_coeff: 0.0001
+
+  # Stability features
+  qk_layernorm: true
+  log_max_attention_logit: true
 
 # Logging
 logger:

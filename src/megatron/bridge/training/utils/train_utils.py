@@ -523,10 +523,11 @@ def training_log(
                 wandb_writer.log(l2_report, iteration)
             if mlflow_logger:
                 mlflow_logger.log_metrics(_sanitize_mlflow_metrics(l2_report), step=iteration)
+        trained_tokens = train_state.consumed_train_samples * config.dataset.seq_length
         if wandb_writer:
-            wandb_writer.log({"samples vs steps": train_state.consumed_train_samples}, iteration)
+            wandb_writer.log({"trained_samples": train_state.consumed_train_samples, "trained_tokens": trained_tokens}, iteration)
         if mlflow_logger:
-            mlflow_logger.log_metrics({"samples vs steps": train_state.consumed_train_samples}, step=iteration)
+            mlflow_logger.log_metrics({"trained_samples": train_state.consumed_train_samples, "trained_tokens": trained_tokens}, step=iteration)
         writer.add_scalar("learning-rate", learning_rate, iteration)
         writer.add_scalar("learning-rate vs samples", learning_rate, train_state.consumed_train_samples)
         if wandb_writer and learning_rate is not None:
