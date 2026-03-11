@@ -1,0 +1,23 @@
+{
+  "benchmarks": {
+    "adlr_arc_challenge_llama_25_shot": {
+      "models": {
+        "nemotron_3_nano_small_muon": [
+          {
+            "invocation_id": "6e5f187da614b21c",
+            "job_id": "6e5f187da614b21c.8",
+            "harness": "lm-evaluation-harness",
+            "container": "nvcr.io/nvidia/eval-factory/lm-evaluation-harness:26.01",
+            "scores": {
+              "adlr_arc_challenge_llama_acc": 0.1,
+              "adlr_arc_challenge_llama_acc_norm": 0.1
+            },
+            "timestamp": 1773200852.0837154,
+            "executor": "local"
+          }
+        ]
+      }
+    }
+  },
+  "export_timestamp": "2026-03-11T04:43:24.919208"
+}

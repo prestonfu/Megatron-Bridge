@@ -1,0 +1,2 @@
+Model Name,Harness,Task Name,Executor,Container,Invocation ID,Job ID,hellaswag_acc,hellaswag_acc_norm
+nemotron_3_nano_small_muon,lm-evaluation-harness,hellaswag,local,nvcr.io/nvidia/eval-factory/lm-evaluation-harness:26.01,6e5f187da614b21c,6e5f187da614b21c.9,0.4,0.2

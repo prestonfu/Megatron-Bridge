@@ -1,0 +1,76 @@
+{
+  "response_stats": {
+    "description": "Response statistics saved during processing",
+    "avg_prompt_tokens": null,
+    "avg_total_tokens": null,
+    "avg_completion_tokens": null,
+    "avg_latency_ms": 9.6,
+    "max_prompt_tokens": null,
+    "max_total_tokens": null,
+    "max_completion_tokens": null,
+    "max_latency_ms": 5818.09,
+    "count": 28861,
+    "successful_count": 0,
+    "tool_calls_count": 0,
+    "function_calls_count": 0,
+    "finish_reason": {},
+    "stop_reason": {},
+    "status_codes": {
+      "500": 28861
+    },
+    "inference_time": 495.04012513160706,
+    "run_id": 6,
+    "last_request_time": 1773182418.3513548,
+    "inference_run_times": {
+      "0": {
+        "run_start": "2026-03-10T08:46:07.803920",
+        "first_request_time": "2026-03-10T08:46:44.372748",
+        "last_request_time": "2026-03-10T08:47:11.643646",
+        "inference_time": 27.27089786529541,
+        "time_to_first_request_seconds": 36.569
+      },
+      "1": {
+        "run_start": "2026-03-10T09:28:40.658552",
+        "first_request_time": "2026-03-10T09:29:01.716237",
+        "last_request_time": "2026-03-10T09:29:12.398995",
+        "inference_time": 10.68275761604309,
+        "time_to_first_request_seconds": 21.058
+      },
+      "2": {
+        "run_start": "2026-03-10T21:49:15.696846",
+        "first_request_time": "2026-03-10T21:49:37.035632",
+        "last_request_time": "2026-03-10T21:50:14.045711",
+        "inference_time": 37.01007914543152,
+        "time_to_first_request_seconds": 21.339
+      },
+      "3": {
+        "run_start": "2026-03-10T21:55:50.415534",
+        "first_request_time": "2026-03-10T21:56:11.078651",
+        "last_request_time": "2026-03-10T22:01:04.335851",
+        "inference_time": 293.2572000026703,
+        "time_to_first_request_seconds": 20.663
+      },
+      "4": {
+        "run_start": "2026-03-10T22:23:23.157434",
+        "first_request_time": "2026-03-10T22:23:44.352588",
+        "last_request_time": "2026-03-10T22:24:28.521126",
+        "inference_time": 44.168537855148315,
+        "time_to_first_request_seconds": 21.195
+      },
+      "5": {
+        "run_start": "2026-03-10T22:27:28.414696",
+        "first_request_time": "2026-03-10T22:27:49.691445",
+        "last_request_time": "2026-03-10T22:27:54.017708",
+        "inference_time": 4.326263427734375,
+        "time_to_first_request_seconds": 21.277
+      },
+      "6": {
+        "run_start": "2026-03-10T22:38:39.094808",
+        "first_request_time": "2026-03-10T22:39:00.026966",
+        "last_request_time": "2026-03-10T22:40:18.351355",
+        "inference_time": 78.32438921928406,
+        "time_to_first_request_seconds": 20.932
+      }
+    }
+  }
+}

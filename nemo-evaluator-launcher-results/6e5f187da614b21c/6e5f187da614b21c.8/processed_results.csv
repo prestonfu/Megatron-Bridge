@@ -1,0 +1,2 @@
+Model Name,Harness,Task Name,Executor,Container,Invocation ID,Job ID,adlr_arc_challenge_llama_acc,adlr_arc_challenge_llama_acc_norm
+nemotron_3_nano_small_muon,lm-evaluation-harness,adlr_arc_challenge_llama_25_shot,local,nvcr.io/nvidia/eval-factory/lm-evaluation-harness:26.01,6e5f187da614b21c,6e5f187da614b21c.8,0.1,0.1

@@ -1,0 +1,23 @@
+{
+  "benchmarks": {
+    "openbookqa": {
+      "models": {
+        "nemotron_3_nano_small_muon": [
+          {
+            "invocation_id": "6e5f187da614b21c",
+            "job_id": "6e5f187da614b21c.10",
+            "harness": "lm-evaluation-harness",
+            "container": "nvcr.io/nvidia/eval-factory/lm-evaluation-harness:26.01",
+            "scores": {
+              "openbookqa_acc": 0.1,
+              "openbookqa_acc_norm": 0.2
+            },
+            "timestamp": 1773200852.119869,
+            "executor": "local"
+          }
+        ]
+      }
+    }
+  },
+  "export_timestamp": "2026-03-11T04:43:24.919421"
+}

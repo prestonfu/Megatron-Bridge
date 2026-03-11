@@ -184,3 +184,7 @@ slurm*.out
 
 # UV package manager
 .uv/
+
+core
+exports
+nemotron_3_nano_small_muon_results

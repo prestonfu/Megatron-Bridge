@@ -1,0 +1,2 @@
+Model Name,Harness,Task Name,Executor,Container,Invocation ID,Job ID,piqa_acc,piqa_acc_norm
+nemotron_3_nano_small_muon,lm-evaluation-harness,piqa,local,nvcr.io/nvidia/eval-factory/lm-evaluation-harness:26.01,6e5f187da614b21c,6e5f187da614b21c.11,0.8,0.8

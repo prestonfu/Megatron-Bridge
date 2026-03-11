@@ -142,6 +142,7 @@ def export_megatron_to_hf(
     hf_path: str,
     show_progress: bool = True,
     strict: bool = True,
+    expert_model_parallel_size: int = 1,
 ) -> None:
     """
     Export a Megatron checkpoint to HuggingFace format.
@@ -150,6 +151,7 @@ def export_megatron_to_hf(
         megatron_path: Directory path where the Megatron checkpoint is stored
         hf_path: Directory path where the HuggingFace model will be saved
         show_progress: Display progress bar during weight export
+        expert_model_parallel_size: Expert model parallel size used during training
     """
     print(f"🔄 Starting export: {megatron_path} -> {hf_path}")
 
@@ -174,18 +176,36 @@ def export_megatron_to_hf(
 
     print(f"📋 Found configuration: {config_files[0]}")
 
-    # For demonstration, we'll create a bridge from a known config
-    # This would typically be extracted from the checkpoint metadata
+    # Create bridge from the HF model reference (config + tokenizer only, no weights)
     bridge = AutoBridge.from_hf_pretrained(hf_model, trust_remote_code=True)
+
+    # Build mp_overrides if non-default parallelism was used during training
+    mp_overrides = None
+    if expert_model_parallel_size > 1:
+        mp_overrides = {"expert_model_parallel_size": expert_model_parallel_size}
+        print(f"   Using mp_overrides: {mp_overrides}")
 
     # Export using the convenience method
     print("📤 Exporting to HuggingFace format...")
-    bridge.export_ckpt(
-        megatron_path=megatron_path,
-        hf_path=hf_path,
-        show_progress=show_progress,
-        strict=strict,
-    )
+    if mp_overrides is not None:
+        # export_ckpt doesn't expose mp_overrides, so call the underlying methods directly
+        from megatron.bridge.training.model_load_save import temporary_distributed_context
+
+        with temporary_distributed_context(backend="gloo"):
+            megatron_model = bridge.load_megatron_model(megatron_path, mp_overrides=mp_overrides, wrap_with_ddp=False)
+            bridge.save_hf_pretrained(
+                megatron_model,
+                hf_path,
+                show_progress=show_progress,
+                strict=strict,
+            )
+    else:
+        bridge.export_ckpt(
+            megatron_path=megatron_path,
+            hf_path=hf_path,
+            show_progress=show_progress,
+            strict=strict,
+        )
 
     print(f"✅ Successfully exported model to: {hf_path}")
 
@@ -237,6 +257,9 @@ def main():
     export_parser.add_argument(
         "--not-strict", action="store_true", help="Allow source and target checkpoint to have different keys"
     )
+    export_parser.add_argument(
+        "--expert-model-parallel-size", type=int, default=1, help="Expert model parallel size used during training"
+    )
 
     args = parser.parse_args()
 
@@ -260,6 +283,7 @@ def main():
             hf_path=args.hf_path,
             show_progress=not args.no_progress,
             strict=not args.not_strict,
+            expert_model_parallel_size=args.expert_model_parallel_size,
         )
     else:
         raise RuntimeError(f"Unknown command: {args.command}")

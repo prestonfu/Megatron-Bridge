@@ -1,0 +1,84 @@
+command: '{% if target.api_endpoint.api_key_name is not none %}OPENAI_API_KEY=${{target.api_endpoint.api_key_name}}{%
+  endif %} lm-eval --tasks {{config.params.task}}{% if config.params.extra.num_fewshot
+  is defined %} --num_fewshot {{ config.params.extra.num_fewshot }}{% endif %} --model
+  {% if target.api_endpoint.type == "completions" %}local-completions{% elif target.api_endpoint.type
+  == "chat" %}local-chat-completions{% endif %} --model_args "base_url={{target.api_endpoint.url}},model={{target.api_endpoint.model_id}},tokenized_requests={{config.params.extra.tokenized_requests}},{%
+  if config.params.extra.tokenizer is not none %}tokenizer={{config.params.extra.tokenizer}}{%
+  endif %},tokenizer_backend={{config.params.extra.tokenizer_backend}},num_concurrent={{config.params.parallelism}},timeout={{
+  config.params.request_timeout }},max_retries={{ config.params.max_retries }},stream={{
+  target.api_endpoint.stream }}" --log_samples --output_path {{config.output_dir}}
+  --use_cache {{config.output_dir}}/lm_cache {% if config.params.limit_samples is
+  not none %}--limit {{config.params.limit_samples}}{% endif %} {% if target.api_endpoint.type
+  == "chat" %}--fewshot_as_multiturn --apply_chat_template {% endif %} {% if config.params.extra.args
+  is defined %} {{config.params.extra.args}} {% endif %} {% if config.params.temperature
+  is not none or config.params.top_p is not none or config.params.max_new_tokens is
+  not none %}--gen_kwargs="{% if config.params.temperature is not none %}temperature={{
+  config.params.temperature }}{% endif %}{% if config.params.top_p is not none %},top_p={{
+  config.params.top_p}}{% endif %}{% if config.params.max_new_tokens is not none %},max_gen_toks={{
+  config.params.max_new_tokens }}{% endif %}"{% endif %} {% if config.params.extra.downsampling_ratio
+  is not none %}--downsampling_ratio {{ config.params.extra.downsampling_ratio }}{%
+  endif %}'
+config:
+  output_dir: eval_results/local_nemotron_3_nano_small_muon/adlr_mmlu_pro_5_shot_base
+  params:
+    extra:
+      downsampling_ratio: null
+      num_fewshot: 5
+      tokenized_requests: false
+      tokenizer: null
+      tokenizer_backend: None
+    limit_samples: null
+    max_new_tokens: null
+    max_retries: 5
+    parallelism: 4
+    request_timeout: 36000
+    task: adlr_mmlu_pro_5_shot_base
+    temperature: 0.0
+    top_p: 1.0e-05
+  required_capabilities: null
+  supported_endpoint_types:
+  - completions
+  type: adlr_mmlu_pro_5_shot_base
+framework_name: lm-evaluation-harness
+pkg_name: lm_evaluation_harness
+target:
+  api_endpoint:
+    adapter_config:
+      discovery:
+        dirs: []
+        modules: []
+      endpoint_type: chat
+      interceptors:
+      - config:
+          cache_dir: eval_results/local_nemotron_3_nano_small_muon/adlr_mmlu_pro_5_shot_base/cache
+          max_saved_requests: 5
+          max_saved_responses: 5
+          reuse_cached_responses: true
+          save_requests: true
+          save_responses: true
+        enabled: true
+        name: caching
+      - config: {}
+        enabled: true
+        name: endpoint
+      - config:
+          cache_dir: eval_results/local_nemotron_3_nano_small_muon/adlr_mmlu_pro_5_shot_base/response_stats_cache
+          logging_aggregated_stats_interval: 100
+        enabled: true
+        name: response_stats
+      log_failed_requests: false
+      mode: server
+      post_eval_hooks:
+      - config:
+          html_report_size: 5
+          report_types:
+          - html
+          - json
+        enabled: true
+        name: post_eval_report
+    api_key: null
+    api_key_name: null
+    model_id: megatron_model
+    stream: false
+    type: completions
+    url: http://0.0.0.0:8000/v1/completions/

@@ -1,0 +1,2 @@
+Model Name,Harness,Task Name,Executor,Container,Invocation ID,Job ID,adlr_gsm8k_fewshot_cot_exact_match,adlr_gsm8k_fewshot_cot_parse_meta
+nemotron_3_nano_small_muon,lm-evaluation-harness,adlr_gsm8k_cot_8_shot,local,nvcr.io/nvidia/eval-factory/lm-evaluation-harness:26.01,6e5f187da614b21c,6e5f187da614b21c.5,0.0,999.0

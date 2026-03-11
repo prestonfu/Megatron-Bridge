@@ -164,6 +164,7 @@ def main():
         except Exception as e:
             results[task] = {"error": str(e)}
             task_bar.write(f"✗ {task} FAILED: {e}")
+            raise
         finally:
             stop_poll.set()
             poll_thread.join(timeout=3)

@@ -1,0 +1,2 @@
+Model Name,Harness,Task Name,Executor,Container,Invocation ID,Job ID,adlr_mbpp_sanitized_3_shot_greedy_pass_at_1__n=1__evalplus_sanitized
+nemotron_3_nano_small_muon,lm-evaluation-harness,adlr_mbpp_sanitized_3_shot_greedy,local,nvcr.io/nvidia/eval-factory/lm-evaluation-harness:26.01,6e5f187da614b21c,6e5f187da614b21c.4,0.0

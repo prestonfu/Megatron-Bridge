@@ -1,0 +1,27 @@
+{
+  "benchmarks": {
+    "adlr_math_500_4_shot_sampled": {
+      "models": {
+        "nemotron_3_nano_small_muon": [
+          {
+            "invocation_id": "6e5f187da614b21c",
+            "job_id": "6e5f187da614b21c.7",
+            "harness": "lm-evaluation-harness",
+            "container": "nvcr.io/nvidia/eval-factory/lm-evaluation-harness:26.01",
+            "scores": {
+              "adlr_math_500_4_shot_sampled_pass@16[32]__math_verify": 0.0,
+              "adlr_math_500_4_shot_sampled_pass@1[32]__math_verify": 0.0,
+              "adlr_math_500_4_shot_sampled_pass@2[32]__math_verify": 0.0,
+              "adlr_math_500_4_shot_sampled_pass@32[32]__math_verify": 0.0,
+              "adlr_math_500_4_shot_sampled_pass@4[32]__math_verify": 0.0,
+              "adlr_math_500_4_shot_sampled_pass@8[32]__math_verify": 0.0
+            },
+            "timestamp": 1773200852.080437,
+            "executor": "local"
+          }
+        ]
+      }
+    }
+  },
+  "export_timestamp": "2026-03-11T04:43:24.919101"
+}

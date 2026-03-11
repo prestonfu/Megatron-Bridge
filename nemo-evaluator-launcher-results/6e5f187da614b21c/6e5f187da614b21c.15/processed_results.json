@@ -1,0 +1,39 @@
+{
+  "benchmarks": {
+    "adlr_mgsm_native_cot_8_shot": {
+      "models": {
+        "nemotron_3_nano_small_muon": [
+          {
+            "invocation_id": "6e5f187da614b21c",
+            "job_id": "6e5f187da614b21c.15",
+            "harness": "lm-evaluation-harness",
+            "container": "nvcr.io/nvidia/eval-factory/lm-evaluation-harness:26.01",
+            "scores": {
+              "adlr_mgsm_native_cot_8_shot_de_exact_match__flexible-extract": 0.0,
+              "adlr_mgsm_native_cot_8_shot_de_exact_match__strict-match": 0.0,
+              "adlr_mgsm_native_cot_8_shot_de_exact_match__symbolic-match": 0.0,
+              "adlr_mgsm_native_cot_8_shot_es_exact_match__flexible-extract": 0.0,
+              "adlr_mgsm_native_cot_8_shot_es_exact_match__strict-match": 0.0,
+              "adlr_mgsm_native_cot_8_shot_es_exact_match__symbolic-match": 0.0,
+              "adlr_mgsm_native_cot_8_shot_fr_exact_match__flexible-extract": 0.0,
+              "adlr_mgsm_native_cot_8_shot_fr_exact_match__strict-match": 0.0,
+              "adlr_mgsm_native_cot_8_shot_fr_exact_match__symbolic-match": 0.0,
+              "adlr_mgsm_native_cot_8_shot_ja_exact_match__flexible-extract": 0.0,
+              "adlr_mgsm_native_cot_8_shot_ja_exact_match__strict-match": 0.0,
+              "adlr_mgsm_native_cot_8_shot_ja_exact_match__symbolic-match": 0.0,
+              "adlr_mgsm_native_cot_8_shot_ru_exact_match__flexible-extract": 0.0,
+              "adlr_mgsm_native_cot_8_shot_ru_exact_match__strict-match": 0.0,
+              "adlr_mgsm_native_cot_8_shot_ru_exact_match__symbolic-match": 0.0,
+              "adlr_mgsm_native_cot_8_shot_zh_exact_match__flexible-extract": 0.0,
+              "adlr_mgsm_native_cot_8_shot_zh_exact_match__strict-match": 0.0,
+              "adlr_mgsm_native_cot_8_shot_zh_exact_match__symbolic-match": 0.0
+            },
+            "timestamp": 1773200852.13646,
+            "executor": "local"
+          }
+        ]
+      }
+    }
+  },
+  "export_timestamp": "2026-03-11T04:43:24.920012"
+}

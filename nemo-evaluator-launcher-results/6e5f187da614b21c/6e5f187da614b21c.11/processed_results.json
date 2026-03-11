@@ -1,0 +1,23 @@
+{
+  "benchmarks": {
+    "piqa": {
+      "models": {
+        "nemotron_3_nano_small_muon": [
+          {
+            "invocation_id": "6e5f187da614b21c",
+            "job_id": "6e5f187da614b21c.11",
+            "harness": "lm-evaluation-harness",
+            "container": "nvcr.io/nvidia/eval-factory/lm-evaluation-harness:26.01",
+            "scores": {
+              "piqa_acc": 0.8,
+              "piqa_acc_norm": 0.8
+            },
+            "timestamp": 1773200852.1232414,
+            "executor": "local"
+          }
+        ]
+      }
+    }
+  },
+  "export_timestamp": "2026-03-11T04:43:24.919526"
+}

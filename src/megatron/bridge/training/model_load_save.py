@@ -382,6 +382,9 @@ def load_megatron_model(
     model_cfg.context_parallel_size = 1
     model_cfg.expert_model_parallel_size = 1
     model_cfg.expert_tensor_parallel_size = 1
+    # Flex dispatcher requires TPxEP > 1; fall back to alltoall for single-GPU export
+    if getattr(model_cfg, "moe_token_dispatcher_type", None) == "flex":
+        model_cfg.moe_token_dispatcher_type = "alltoall"
     model_cfg.sequence_parallel = False
     model_cfg.perform_initialization = False
     model_cfg.virtual_pipeline_model_parallel_size = None

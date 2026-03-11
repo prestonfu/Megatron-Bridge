@@ -1,0 +1,30 @@
+{
+  "benchmarks": {
+    "adlr_agieval_en_cot": {
+      "models": {
+        "nemotron_3_nano_small_muon": [
+          {
+            "invocation_id": "6e5f187da614b21c",
+            "job_id": "6e5f187da614b21c.2",
+            "harness": "lm-evaluation-harness",
+            "container": "nvcr.io/nvidia/eval-factory/lm-evaluation-harness:26.01",
+            "scores": {
+              "adlr_agieval_en_cot_exact_match__custom-extract": 0.0125,
+              "adlr_agieval_aqua_rat_cot_exact_match__custom-extract": 0.0,
+              "adlr_agieval_logiqa_en_cot_exact_match__custom-extract": 0.1,
+              "adlr_agieval_lsat_ar_cot_exact_match__custom-extract": 0.0,
+              "adlr_agieval_lsat_lr_cot_exact_match__custom-extract": 0.0,
+              "adlr_agieval_lsat_rc_cot_exact_match__custom-extract": 0.0,
+              "adlr_agieval_sat_en_cot_exact_match__custom-extract": 0.0,
+              "adlr_agieval_sat_en_without_passage_cot_exact_match__custom-extract": 0.0,
+              "adlr_agieval_sat_math_cot_exact_match__custom-extract": 0.0
+            },
+            "timestamp": 1773200852.0631747,
+            "executor": "local"
+          }
+        ]
+      }
+    }
+  },
+  "export_timestamp": "2026-03-11T04:43:24.918499"
+}

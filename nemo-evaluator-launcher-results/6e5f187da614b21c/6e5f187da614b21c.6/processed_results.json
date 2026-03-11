@@ -1,0 +1,52 @@
+{
+  "benchmarks": {
+    "adlr_minerva_math_nemo_4_shot": {
+      "models": {
+        "nemotron_3_nano_small_muon": [
+          {
+            "invocation_id": "6e5f187da614b21c",
+            "job_id": "6e5f187da614b21c.6",
+            "harness": "lm-evaluation-harness",
+            "container": "nvcr.io/nvidia/eval-factory/lm-evaluation-harness:26.01",
+            "scores": {
+              "adlr_minerva_math_nemo_exact_match": 0.02857142857142857,
+              "adlr_minerva_math_nemo_level_5_exact_match": 0.07142857142857142,
+              "adlr_minerva_math_nemo_math500_exact_match": 0.07142857142857142,
+              "adlr_minerva_math_algebra_nemo_exact_match": 0.2,
+              "adlr_minerva_math_algebra_nemo_level_5_exact_match": 0.5,
+              "adlr_minerva_math_algebra_nemo_math500_exact_match": 0.5,
+              "adlr_minerva_math_algebra_nemo_parse_meta": 999.0,
+              "adlr_minerva_math_counting_and_prob_nemo_exact_match": 0.0,
+              "adlr_minerva_math_counting_and_prob_nemo_level_5_exact_match": 0.0,
+              "adlr_minerva_math_counting_and_prob_nemo_math500_exact_match": 0.0,
+              "adlr_minerva_math_counting_and_prob_nemo_parse_meta": 999.0,
+              "adlr_minerva_math_geometry_nemo_exact_match": 0.0,
+              "adlr_minerva_math_geometry_nemo_level_5_exact_match": 0.0,
+              "adlr_minerva_math_geometry_nemo_math500_exact_match": 0.0,
+              "adlr_minerva_math_geometry_nemo_parse_meta": 999.0,
+              "adlr_minerva_math_intermediate_algebra_nemo_exact_match": 0.0,
+              "adlr_minerva_math_intermediate_algebra_nemo_level_5_exact_match": 0.0,
+              "adlr_minerva_math_intermediate_algebra_nemo_math500_exact_match": 0.0,
+              "adlr_minerva_math_intermediate_algebra_nemo_parse_meta": 999.0,
+              "adlr_minerva_math_num_theory_nemo_exact_match": 0.0,
+              "adlr_minerva_math_num_theory_nemo_level_5_exact_match": 0.0,
+              "adlr_minerva_math_num_theory_nemo_math500_exact_match": 0.0,
+              "adlr_minerva_math_num_theory_nemo_parse_meta": 999.0,
+              "adlr_minerva_math_prealgebra_nemo_exact_match": 0.0,
+              "adlr_minerva_math_prealgebra_nemo_level_5_exact_match": 0.0,
+              "adlr_minerva_math_prealgebra_nemo_math500_exact_match": 0.0,
+              "adlr_minerva_math_prealgebra_nemo_parse_meta": 999.0,
+              "adlr_minerva_math_precalc_nemo_exact_match": 0.0,
+              "adlr_minerva_math_precalc_nemo_level_5_exact_match": 0.0,
+              "adlr_minerva_math_precalc_nemo_math500_exact_match": 0.0,
+              "adlr_minerva_math_precalc_nemo_parse_meta": 999.0
+            },
+            "timestamp": 1773200852.0765824,
+            "executor": "local"
+          }
+        ]
+      }
+    }
+  },
+  "export_timestamp": "2026-03-11T04:43:24.918965"
+}
