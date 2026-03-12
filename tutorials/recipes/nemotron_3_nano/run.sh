@@ -26,30 +26,34 @@ run_adamw() {
     "$@"
 }
 
-run small_muon_lr3e-4 \
-  optimizer.lr=0.0003 || true
-
-run small_muon_lr3e-4_nosoftcap \
-  optimizer.lr=0.0003 \
-  '~model.attn_logit_softcap' \
-  '~model.output_logit_softcap' || true
-
 run small_muon_lr5e-4 \
-  optimizer.lr=0.0005 || true
+  optimizer.lr=0.0005 \
+  train.train_iters=10010 \
+  scheduler.lr_decay_iters=10010 \
+  scheduler.lr_wsd_decay_iters=2010 \
+  checkpoint.save_interval=1000 || true
 
-run small_muon_lr1e-3 \
-  optimizer.lr=0.001 || true
+# run small_muon_lr3e-4_nosoftcap \
+#   optimizer.lr=0.0003 \
+#   '~model.attn_logit_softcap' \
+#   '~model.output_logit_softcap' || true
 
-run small_muon_polar_lr3e-4 \
-  optimizer.lr=0.0003 \
-  optimizer.muon_coefficient_type=polar_express \
-  optimizer.muon_num_ns_steps=8 || true
+# run small_muon_lr5e-4 \
+#   optimizer.lr=0.0005 || true
 
-run_adamw small_adamw_lr3e-4 \
-  optimizer.lr=0.0003 || true
+# run small_muon_lr1e-3 \
+#   optimizer.lr=0.001 || true
 
-run_adamw small_adamw_lr5e-4 \
-  optimizer.lr=0.0005 || true
+# run small_muon_polar_lr3e-4 \
+#   optimizer.lr=0.0003 \
+#   optimizer.muon_coefficient_type=polar_express \
+#   optimizer.muon_num_ns_steps=8 || true
 
-run_adamw small_adamw_lr1e-3 \
-  optimizer.lr=0.001 || true
+# run_adamw small_adamw_lr3e-4 \
+#   optimizer.lr=0.0003 || true
+
+# run_adamw small_adamw_lr5e-4 \
+#   optimizer.lr=0.0005 || true
+
+# run_adamw small_adamw_lr1e-3 \
+#   optimizer.lr=0.001 || true
